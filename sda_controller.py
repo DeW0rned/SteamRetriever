@@ -10,17 +10,6 @@ import win32gui
 import time
 
 
-def prepare_sda(function: FunctionType):
-    def wrapper(*args, **kwargs):
-        sda_handle = win32gui.FindWindow(None, 'MainWindow')
-        win32gui.SetForegroundWindow(sda_handle)
-        win32gui.MoveWindow(sda_handle, 0, 0, 500, 700, True)
-
-        return function(*args, **kwargs)
-
-    return wrapper
-
-
 class SdaController:
     def __init__(self, templates_path: str, screenshot_path: str):
         """
@@ -48,6 +37,7 @@ class SdaController:
         :param offsets: смещения(в процентах)
         :return: список координат
         """
+
         current_attempt = 0
 
         while current_attempt < 5:
@@ -80,8 +70,7 @@ class SdaController:
 
         raise ValueError('Не удалось найти элемент!')
 
-    @prepare_sda
-    def import_account(self, mafile_path: str, password: str):
+    def _import_sda_account(self, mafile_path: str, password: str):
         """
         Метод импортирует аккаунт с помощью mafile
 
@@ -110,7 +99,6 @@ class SdaController:
             offsets=(0.2, 0.5)
         )
         pg.click(searching_field_x, searching_field_y)
-        time.sleep(0.5)
         pg.write(mafile_dir)
         pg.press('enter')
 
@@ -136,8 +124,7 @@ class SdaController:
         )
         pg.click(login_button_x, login_button_y)
 
-    @prepare_sda
-    def remove_account(self):
+    def _remove_sda_account(self):
         """
         Удаление аккаунта из SDA
         """
@@ -153,8 +140,7 @@ class SdaController:
         pg.click(account_panel_x, account_panel_y, button='right')
         pg.click(account_panel_x+10, account_panel_y+50)
 
-    @prepare_sda
-    def get_code(self) -> str:
+    def _get_sda_code(self) -> str:
         """
         Получение кода SDA
 
@@ -169,16 +155,33 @@ class SdaController:
             template_path=templates['copy_button'],
             offsets=(0.5, 0.5)
         )
+
         pg.click(copy_button_x, copy_button_y)
 
         win32clipboard.OpenClipboard()
-        clipboard_text = win32clipboard.GetClipboardData()
+        last_code = win32clipboard.GetClipboardData()
         win32clipboard.CloseClipboard()
+
+        while True:
+            time.sleep(0.5)
+
+            pg.click(copy_button_x, copy_button_y)
+
+            try:
+                win32clipboard.OpenClipboard()
+                clipboard_text = win32clipboard.GetClipboardData()
+                win32clipboard.CloseClipboard()
+            except TypeError:
+                continue
+
+            if clipboard_text != last_code:
+                break
+
+            last_code = clipboard_text
 
         return clipboard_text
 
-    @prepare_sda
-    def accept_confirmation(self):
+    def _accept_sda_confirmation(self):
         """
         Подтвержение запроса на аккаунте
         """
@@ -202,7 +205,3 @@ class SdaController:
 
         confirmations_handle = win32gui.FindWindow(None, 'Confirmations')
         win32gui.PostMessage(confirmations_handle, win32con.WM_CLOSE, 0, 0)
-
-
-
-
