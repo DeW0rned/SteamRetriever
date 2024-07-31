@@ -71,8 +71,10 @@ class SteamRetriever(ChromeDriverBase, SdaController, Firstmail):
                 login = file_text.split(':')[0]
                 password = file_text.split(':')[1].rstrip()
 
+                accounts[account_name]['txt'] = f'{os.getcwd()}/{self._accounts_path}/{account_file}'
                 accounts[account_name]['login'] = login
                 accounts[account_name]['password'] = password
+
 
         return accounts
 
@@ -87,6 +89,29 @@ class SteamRetriever(ChromeDriverBase, SdaController, Firstmail):
             emails = [email.rstrip() for email in file.readlines()]
 
         return emails
+
+    def _remove_account(self, account_name: str, accounts: dict):
+        """
+        Удаление аккаунта из папки аккаунтов
+
+        :param account_name: имя аккаунта
+        """
+
+        for format_ in ['txt', 'maFile']:
+            os.remove(accounts[account_name][format_])
+
+    def _remove_first_email(self, emails: list) -> list:
+        """
+        Удаление email из файла
+
+        :param email: почта
+        :return: новый список почт без первой
+        """
+
+        with open(self._emails_path, 'w', encoding='utf-8') as file:
+            file.write('\n'.join(email for email in emails[1:]))
+
+        return emails[1:]
 
     def _sign_in_account(self, login: str, password: str):
         """
@@ -210,6 +235,9 @@ class SteamRetriever(ChromeDriverBase, SdaController, Firstmail):
         self._click_element(
             xpath='//*[@id="reset_phonenumber_form"]/div[2]/input'
         )
+        self._wait_element(
+            xpath='//*[@id="responsive_page_template_content"]/div[3]/div/h2'
+        )
 
     def _logout_account(self):
         """
@@ -223,8 +251,7 @@ class SteamRetriever(ChromeDriverBase, SdaController, Firstmail):
             xpath='//*[@id="account_dropdown"]/div/a[4]'
         )
         self._wait_element(
-            xpath='// *[ @ id = "waitforauth_waiting"]',
-            visibility=False
+            xpath='//*[@id="global_action_menu"]/a[2]'
         )
 
     def _add_account_2_output(
@@ -274,11 +301,6 @@ class SteamRetriever(ChromeDriverBase, SdaController, Firstmail):
                 email = email_data.split(':')[0]
                 email_password = email_data.split(':')[1]
 
-                try:
-                    emails.pop(0)
-                except IndexError:
-                    pass
-
                 self._show_log(f'меняем email на {email}')
                 self._change_email(
                     password=account_data['password'],
@@ -300,7 +322,9 @@ class SteamRetriever(ChromeDriverBase, SdaController, Firstmail):
                     email_password=email_password
                 )
 
-                self._show_log('удаляем аккаунт из SDA и выходим из аккаунта')
+                self._show_log('удаляем аккаунт, почту и выходим из аккаунта')
+                emails = self._remove_first_email(emails=emails)
+                self._remove_account(account_name=account_name, accounts=accounts)
                 self._remove_sda_account()
                 self._logout_account()
 

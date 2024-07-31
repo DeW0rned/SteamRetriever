@@ -17,6 +17,7 @@ class Firstmail:
                 'X-API-KEY': api_key
             }
         )
+        self._last_codes = []
 
     def _get_email_code(self, email: str, password: str) -> str:
         """
@@ -31,17 +32,28 @@ class Firstmail:
             'username': email,
             'password': password
         }
-        code = ''
 
-        while not code:
-            response = self._session.get(
-                url='https://api.firstmail.ltd/v1/market/get/message',
-                params=params
-            ).json()
-
+        while True:
             try:
-                code = re.findall(r'[A-Z0-9]{5}', response['message'])[6]
-                return code
+                response = self._session.get(
+                    url='https://api.firstmail.ltd/v1/mail/one',
+                    params=params
+                ).json()
+
+                try:
+                    code = response['text'].split(
+                        'Код подтверждения вашего аккаунта:'
+                    )[1]
+                except IndexError:
+                    code = response['text'].split(
+                        'Код подтверждения, необходимый для\r\nизменения адреса эл. почты:'
+                    )[1]
+
+                code = re.sub('\s+', '', code)[:5]
+
+                if code not in self._last_codes:
+                    self._last_codes.append(code)
+                    return code
+
             except Exception as ex:
-                time.sleep(1)
                 continue

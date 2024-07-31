@@ -21,6 +21,19 @@ class SdaController:
         self._templates_path = templates_path
         self._screenshot_path = screenshot_path
 
+    @staticmethod
+    def _find_window_by_title(title):
+        def enum_windows_callback(hwnd, results):
+            window_text = win32gui.GetWindowText(hwnd)
+
+            if title in window_text:
+                results.append(hwnd)
+
+        windows = []
+        win32gui.EnumWindows(enum_windows_callback, windows)
+
+        return windows
+
     def _update_screenshot(self):
         """
         Обновление скриншота
@@ -124,6 +137,16 @@ class SdaController:
         )
         pg.click(login_button_x, login_button_y)
 
+        account_imported = False
+
+        while not account_imported:
+            time.sleep(1)
+
+            password_windows = self._find_window_by_title('Enter a password')
+
+            if not password_windows:
+                account_imported = True
+
     def _remove_sda_account(self):
         """
         Удаление аккаунта из SDA
@@ -135,7 +158,7 @@ class SdaController:
 
         account_panel_x, account_panel_y = self._find_template_location(
             template_path=templates['account_panel'],
-            offsets=(0.5, 0.5)
+            offsets=(0.1, 0.5)
         )
         pg.click(account_panel_x, account_panel_y, button='right')
         pg.click(account_panel_x+10, account_panel_y+50)
@@ -156,22 +179,19 @@ class SdaController:
             offsets=(0.5, 0.5)
         )
 
-        pg.click(copy_button_x, copy_button_y)
-
-        win32clipboard.OpenClipboard()
-        last_code = win32clipboard.GetClipboardData()
-        win32clipboard.CloseClipboard()
+        last_code = None
 
         while True:
             time.sleep(0.5)
 
             pg.click(copy_button_x, copy_button_y)
 
-            try:
-                win32clipboard.OpenClipboard()
-                clipboard_text = win32clipboard.GetClipboardData()
-                win32clipboard.CloseClipboard()
-            except TypeError:
+            win32clipboard.OpenClipboard()
+            clipboard_text = win32clipboard.GetClipboardData()
+            win32clipboard.CloseClipboard()
+
+            if last_code is None:
+                last_code = clipboard_text
                 continue
 
             if clipboard_text != last_code:
@@ -196,6 +216,8 @@ class SdaController:
             offsets=(0.5, 0.5)
         )
         pg.doubleClick(account_panel_x, account_panel_y)
+
+        time.sleep(0.5)
 
         confirmation_panel_x, confirmation_panel_y = self._find_template_location(
             template_path=templates['confirmation_panel'],

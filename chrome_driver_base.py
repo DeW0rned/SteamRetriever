@@ -92,7 +92,7 @@ class ChromeDriverBase:
         element = self._driver.find_element(By.XPATH, xpath)
         element.click()
 
-    def _wait_element(self, xpath: str, visibility: bool = True):
+    def _wait_element(self, xpath: str):
         """
         Ожидание появления элемента
 
@@ -100,7 +100,6 @@ class ChromeDriverBase:
         """
 
         WebDriverWait(self._driver, 15).until(
-            EC.presence_of_element_located((By.XPATH, xpath)) if visibility
-            else EC.invisibility_of_element((By.XPATH, xpath))
+            EC.presence_of_element_located((By.XPATH, xpath))
         )
 
