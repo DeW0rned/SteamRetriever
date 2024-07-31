@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>README</title>
+        <link rel="stylesheet" href="./styles.css">
+    </head>
+  <body>
+        <div class="main_block">
+            <h1>Инструкция</h1>
+            <div class="split_line"></div>
+            <ol>
+                <li><b>Установка библиотек:</b></li>
+                <div class="instruction_block">
+                    Запусти <b>install.bat</b> <br>
+                    Подожди установки <br>
+                    Проверь наличие ошибок <br>
+                </div>
+                <li><b>Добавление аккаунтов:</b></li>
+                <div class="instruction_block">
+                    Зайди в директорию <b>data/accounts</b> <br>
+                    Добавь туда аккаунты в формате двух файлов для каждого аккаунта(<b>.maFile, .txt</b>)
+                </div>
+                <li><b>Добавление почт <a href="https://firstmail.ltd/">firstmail</a>:</b></li>
+                <div class="instruction_block">
+                    Зайди в директорию <b>data/</b> <br>
+                    Открой файл <b>emails.txt</b> <br>
+                    Добавь почты(новая почта - новая строка)
+                </div>
+                <li><b>Добавление токена <a href="https://firstmail.ltd/">firstmail</a>:</b></li>
+                <div class="instruction_block">
+                    Перейди на сайт <b><a href="https://firstmail.ltd/">firstmail</a></b> <br>
+                    Нажми в правом верхнем углу <b>История покупок & api</b> <br>
+                    Зарегистрируйся под своей почтой <br>
+                    Зайди в раздел <b>API</b> <br>
+                    Выбери тип ключа: <b>Авторизация в аккаунты...</b>, разрешенный ip: <b>ip на котором происходит ретрив</b> <br>
+                    Зайди в <b>config.ini</b> и вставь токен после "="
+                </div>
+                <li><b>Старт</b></li>
+                <div class="instruction_block">
+                    Запускаешь SDA и <b>start.bat</b> <br>
+                    После открытия браузера сразу же открываешь SDA на передний план
+                </div>
+
+            </ol>
+            <div class="split_line"></div>
+            <div class="PS">
+                Аккаунты будут сохраняться в <b>data/output.txt</b> с новой почтой и паролем от нее <br>
+                Все ошибки будут сохраняться в <b>logs.log</b> <br>
+            </div>
+        </div>
+  </body>
+</html>

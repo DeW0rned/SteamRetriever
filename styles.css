@@ -1,0 +1,38 @@
+body {
+    background: #202433;
+    padding: 0 25px 5px;
+    color: #c7c7c7
+}
+a {
+    text-decoration: none;
+    color: #344ead
+}
+
+h1 {
+    font-size: 50px
+}
+
+li {
+    font-size: 25px
+}
+
+.split_line {
+    background: #76777a;
+    padding: 1px;
+    border-radius: 10px
+}
+
+.instruction_block {
+    background: #181b26;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0;
+    color: #6271a8;
+    font-size: 23px;
+    line-height: 2.5
+}
+
+.PS {
+    font-size: 25px;
+    margin: 25px 5px;
+}
