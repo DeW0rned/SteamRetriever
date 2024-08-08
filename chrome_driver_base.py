@@ -53,6 +53,7 @@ class ChromeDriverBase:
         """
 
         driver_options = webdriver.ChromeOptions()
+        driver_options.page_load_strategy = 'none'
         option_args = ['--disable-images']
 
         for arg in option_args:
